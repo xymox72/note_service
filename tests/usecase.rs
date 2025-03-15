@@ -1,8 +1,7 @@
-use note_service::usecase::note_use_case::{create_note, list_notes};
-use note_service::domain::note::{Note, NoteRepository};
 use async_trait::async_trait;
+use note_service::domain::note::{Note, NoteRepository};
+use note_service::usecase::note_use_case::{create_note, list_notes};
 use tide::Result;
-
 
 struct MockRepo;
 
@@ -16,12 +15,20 @@ impl NoteRepository for MockRepo {
 
     async fn list(&self) -> Result<Vec<Note>> {
         Ok(vec![
-            Note { id: 1, title: "Note 1".into(), content: "Content 1".into() },
-            Note { id: 2, title: "Note 2".into(), content: "Content 2".into() },
+            Note {
+                id: 1,
+                title: "Note 1".into(),
+                content: "Content 1".into(),
+            },
+            Note {
+                id: 2,
+                title: "Note 2".into(),
+                content: "Content 2".into(),
+            },
         ])
     }
 
-    async fn health_check(&self) -> Result<()>{
+    async fn health_check(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -39,4 +46,3 @@ async fn test_list_notes() -> Result<()> {
     assert_eq!(notes.len(), 2);
     Ok(())
 }
-

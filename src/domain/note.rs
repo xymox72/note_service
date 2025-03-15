@@ -9,7 +9,7 @@ pub struct Note {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct NewNote{
+pub struct NewNote {
     pub title: String,
     pub content: String,
 }

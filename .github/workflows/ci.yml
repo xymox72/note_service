@@ -7,12 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  setup:
     runs-on: ubuntu-latest
-
+    outputs:
+      rust-cache-key: ${{ steps.rust-cache.outputs.cache-hit }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -24,25 +24,38 @@ jobs:
         run: |
           curl -fsSL https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 
-      - name: Load .env file
-        run: |
-          grep -v '^#' .env >> $GITHUB_ENV
-
-      - name: Start PostgreSQL
-        run: docker-compose -f docker-compose.ci.yml up -d
-
-      - name: Wait for PostgreSQL
-        run: |
-          until pg_isready -U postgres -h localhost -d notes_db; do
-            echo "Waiting for PostgreSQL..."
-            sleep 1
-          done
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
+  test:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+      - run: rustup update
+      - run: curl -fsSL https://just.systems/install.sh | bash -s -- --to /usr/local/bin
       - name: Run tests
         run: just test
+
+  fmt:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+      - run: rustup update
+      - name: Check formatting
+        run: just fmt
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+      - run: rustup update
+      - name: Run Clippy
+        run: just lint
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [test, fmt, lint]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker image
+        run: just build

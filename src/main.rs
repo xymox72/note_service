@@ -1,16 +1,14 @@
-mod config;
 mod app;
+mod config;
 mod domain;
 mod infra;
 mod usecase;
 
 use app::handlers::{get_notes, health_check, post_note, with_state};
 use dotenvy::dotenv;
+use infra::note_repo_pg::PgNoteRepository;
 use sqlx::postgres::PgPoolOptions;
 use tide::Server;
-use infra::note_repo_pg::PgNoteRepository;
-
-
 
 fn main() -> tide::Result<()> {
     async_std::task::block_on(async {
@@ -23,8 +21,8 @@ fn main() -> tide::Result<()> {
             .connect(&database_url)
             .await?;
 
-        let state = with_state(pool);
-        let mut app: Server<PgNoteRepository> = tide::with_state(state);
+        let repo = PgNoteRepository::new(pool);
+        let mut app: Server<_> = tide::with_state(with_state(repo));
 
         app.at("/notes").get(get_notes);
         app.at("/notes").post(post_note);
@@ -35,5 +33,3 @@ fn main() -> tide::Result<()> {
         Ok(())
     })
 }
-
-

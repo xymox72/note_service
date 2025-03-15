@@ -32,6 +32,11 @@ app-stop:
     docker stop note_service || true
     docker rm -f note_service || true
 
+fmt:
+    cargo fmt -- --check
+
+lint:
+    cargo clippy -- -D warnings
 
 # 🧼 Очистка сборки Rust
 clean:
