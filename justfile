@@ -67,7 +67,7 @@ down:
     just app-stop
     just db-stop
 
-# ❤️ Healthcheck эндпоинт d
+# ❤️ Healthcheck эндпоинт
 health:
     curl -s -o /dev/null -w "%{http_code}\n" http://localhost:${PORT:=8080}/health
 
