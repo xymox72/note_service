@@ -7,16 +7,15 @@ on:
     branches: [ main ]
 
 jobs:
-  check:
+  setup:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        task: [test, fmt, lint]
-
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
       - uses: actions/checkout@v3
 
       - name: Cache cargo dependencies
+        id: cache
         uses: actions/cache@v3
         with:
           path: |
@@ -37,14 +36,30 @@ jobs:
         run: |
           curl -fsSL https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 
-      - name: Run just tasks
-        run: just ${{ matrix.task }}
+  test:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+      - run: just test
+
+  fmt:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+      - run: just fmt
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+      - run: just lint
 
   docker:
     runs-on: ubuntu-latest
-    needs: check
+    needs: [test, fmt, lint]
     steps:
       - uses: actions/checkout@v3
-
-      - name: Build Docker image
-        run: just build
+      - run: just build
