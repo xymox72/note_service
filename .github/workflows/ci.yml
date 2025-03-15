@@ -10,7 +10,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/xymox72/rust-dev-alpine:latest
+      image: ghcr.io/xymox72/rust-dev-alpine:v1.1
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
