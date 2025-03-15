@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "lldb",
+        "request": "launch",
+        "name": "Debug note-service",
+        "cargo": {
+          "args": ["run"]
+        },
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "DATABASE_URL": "postgres://user:password@localhost:5432/notes_db",
+          "RUST_BACKTRACE": "1"
+        },
+        "sourceLanguages": ["rust"]
+      },
+      {
+        "type": "lldb",
+        "request": "launch",
+        "name": "Test: all",
+        "cargo": {
+          "args": ["test"]
+        },
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "DATABASE_URL": "postgres://user:password@localhost:5432/notes_db"
+        },
+        "sourceLanguages": ["rust"]
+      }
+    ]
+  }
+  
