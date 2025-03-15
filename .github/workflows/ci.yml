@@ -8,44 +8,41 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: apline
-
-    services:
-      postgres:
-        image: postgres:17-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: notes_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d notes_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
 
-    - name: Install just
-      run: |
-        curl -fsSL https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+      - name: Install just
+        run: |
+          curl -fsSL https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 
-    - name: Load .env file
-      run: |
-        grep -v '^#' .env >> $GITHUB_ENV
+      - name: Load .env file
+        run: |
+          grep -v '^#' .env >> $GITHUB_ENV
 
-    - name: Wait for database
-      run: |
-        until pg_isready -U postgres -h localhost -d notes_db; do echo "."; sleep 1; done
+      - name: Start PostgreSQL
+        run: docker-compose -f docker-compose.ci.yml up -d
 
-    - name: Run tests
-      run: just test
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -U postgres -h localhost -d notes_db; do
+            echo "Waiting for PostgreSQL..."
+            sleep 1
+          done
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Run tests
+        run: just test
