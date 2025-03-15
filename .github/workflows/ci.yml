@@ -7,13 +7,16 @@ on:
     branches: [ main ]
 
 jobs:
-  setup:
+  check:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [test, fmt, lint]
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cache cargo registry + target
+      - name: Cache cargo dependencies
         uses: actions/cache@v3
         with:
           path: |
@@ -34,38 +37,14 @@ jobs:
         run: |
           curl -fsSL https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v3
-      - run: rustup update
-      - run: curl -fsSL https://just.systems/install.sh | bash -s -- --to /usr/local/bin
-      - name: Run tests
-        run: just test
-
-  fmt:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v3
-      - run: rustup update
-      - name: Check formatting
-        run: just fmt
-
-  lint:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v3
-      - run: rustup update
-      - name: Run Clippy
-        run: just lint
+      - name: Run just tasks
+        run: just ${{ matrix.task }}
 
   docker:
     runs-on: ubuntu-latest
-    needs: [test, fmt, lint]
+    needs: check
     steps:
       - uses: actions/checkout@v3
+
       - name: Build Docker image
         run: just build
