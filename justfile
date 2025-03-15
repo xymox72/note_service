@@ -4,9 +4,18 @@ set dotenv-load
 dev:
     cargo watch -x run
 
-# 🏗 Сборка docker-образа
-build:
+# 🏗 Локальная сборка проекта (для CI)
+build-local:
+    cargo fetch
+    cargo build --locked
+
+# 🐳 Сборка docker-образа
+build-docker:
     docker build -t note-service .
+
+# 👷 Выбор сборки по сценарию
+build:
+    just build-local
 
 # 🐘 Запуск базы данных
 db:
@@ -17,7 +26,7 @@ wait-db:
     @echo "⏳ Ожидание базы данных..."
     docker exec notes_postgres bash -c "until pg_isready -U postgres -d notes_db; do sleep 1; done"
 
-# 🔁 Миграция базы
+# 🔁 Миграция базы данных
 migrate:
     just wait-db
     docker cp migrations/init.sql notes_postgres:/init.sql
@@ -26,38 +35,37 @@ migrate:
 # 🛑 Остановка и удаление базы
 db-stop:
     docker compose down
-# 🛑 Остановка application
+
+# 🛑 Остановка приложения
 app-stop:
     @echo "🛑 Остановка контейнера приложения..."
     docker stop note_service || true
     docker rm -f note_service || true
 
+# 🧪 Тесты
+test:
+    cargo test
+
+# 🧼 Проверка форматирования
 fmt:
     cargo fmt -- --check
 
+# 🧹 Линтинг
 lint:
     cargo clippy -- -D warnings
 
-# 🧼 Очистка сборки Rust
-clean:
-    cargo clean
-
 # 🔼 Полный запуск приложения
 up:
-    just build
+    just build-docker
     just db
     just wait-db
     just migrate
     @echo "✅ Сервис доступен на http://localhost:${PORT:=8080}"
 
-# 🔽 Остановка
+# 🔽 Остановка приложения и базы
 down:
     just app-stop
     just db-stop
-
-# 🧪 Тесты
-test:
-    cargo test
 
 # ❤️ Healthcheck эндпоинт
 health:
@@ -86,3 +94,7 @@ clean-all:
     docker builder prune -a -f
 
     @echo "✅ Docker окружение очищено."
+
+# 🧼 Очистка сборки Rust
+clean:
+    cargo clean
