@@ -7,8 +7,33 @@ on:
     branches: [ main ]
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/xymox72/rust-dev-alpine:latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache cargo dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            /root/.cargo/registry
+            /root/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Pre-fetch dependencies
+        run: cargo fetch
+
   test:
     runs-on: ubuntu-latest
+    needs: setup
     container:
       image: ghcr.io/xymox72/rust-dev-alpine:latest
     steps:
@@ -17,6 +42,7 @@ jobs:
 
   fmt:
     runs-on: ubuntu-latest
+    needs: setup
     container:
       image: ghcr.io/xymox72/rust-dev-alpine:latest
     steps:
@@ -25,6 +51,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    needs: setup
     container:
       image: ghcr.io/xymox72/rust-dev-alpine:latest
     steps:
