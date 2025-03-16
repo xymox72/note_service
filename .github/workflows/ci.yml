@@ -10,16 +10,19 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  setup:
-    name: 🛠️ Setup & Build
+  just-tasks:
+    name: 🚀 ${{ matrix.task }}
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/xymox72/devops-rust:latest
+    strategy:
+      matrix:
+        task: [build-local, test, lint, fmt]
     steps:
-      - uses: actions/checkout@v3.5.3
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v3.5.3
 
-      - name: Cache cargo dependencies
-        id: cache
+      - name: 📦 Cache cargo dependencies
         uses: actions/cache@v3.3.2
         with:
           path: |
@@ -29,95 +32,5 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Build project
-        run: just build-local
-
-      - name: Upload target dir
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: target-dir
-          path: target
-
-  test:
-    name: ✅ Test
-    runs-on: ubuntu-latest
-    needs: setup
-    container:
-      image: ghcr.io/xymox72/devops-rust:latest
-    steps:
-      - uses: actions/checkout@v3.5.3
-
-      - name: Restore cargo cache
-        uses: actions/cache@v3.3.2
-        with:
-          path: |
-            /root/.cargo/registry
-            /root/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: target-dir
-          path: target
-
-      - name: Run tests
-        run: just test
-
-  lint:
-    name: 🔍 Lint
-    runs-on: ubuntu-latest
-    needs: setup
-    container:
-      image: ghcr.io/xymox72/devops-rust:latest
-    steps:
-      - uses: actions/checkout@v3.5.3
-
-      - name: Restore cargo cache
-        uses: actions/cache@v3.3.2
-        with:
-          path: |
-            /root/.cargo/registry
-            /root/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: target-dir
-          path: target
-
-      - name: Run linter
-        run: just lint
-
-  fmt:
-    name: 🧹 Format Check
-    runs-on: ubuntu-latest
-    needs: setup
-    container:
-      image: ghcr.io/xymox72/devops-rust:latest
-    steps:
-      - uses: actions/checkout@v3.5.3
-
-      - name: Restore cargo cache
-        uses: actions/cache@v3.3.2
-        with:
-          path: |
-            /root/.cargo/registry
-            /root/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: target-dir
-          path: target
-
-      - name: Check formatting
-        run: just fmt
+      - name: ⚙️ Run just ${{ matrix.task }}
+        run: just ${{ matrix.task }}
