@@ -78,18 +78,7 @@ clean-all:
     @echo "🧹 Останавливаем все контейнеры..."
     docker stop $(docker ps -aq) || true
 
-    @echo "🗑 Удаляем все контейнеры..."build:
-    cargo build --release
-
-test:
-    cargo nextest run --all-targets
-
-lint:
-    cargo clippy --all-targets --all-features -- -D warnings
-
-fmt:
-    cargo fmt --all -- --check
-
+    @echo "🗑 Удаляем все контейнеры..."
     docker rm -f $(docker ps -aq) || true
 
     @echo "🖼 Удаляем все образы..."
