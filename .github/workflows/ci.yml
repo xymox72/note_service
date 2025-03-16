@@ -17,10 +17,10 @@ jobs:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Cache cargo dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: |
             /root/.cargo/registry
@@ -33,7 +33,7 @@ jobs:
         run: just build-local
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: target-dir
           path: target
@@ -46,10 +46,10 @@ jobs:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Restore cargo dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: |
             /root/.cargo/registry
@@ -59,7 +59,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: target-dir
           path: target
@@ -75,10 +75,10 @@ jobs:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Restore cargo dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: |
             /root/.cargo/registry
@@ -88,7 +88,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: target-dir
           path: target
@@ -104,10 +104,10 @@ jobs:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Restore cargo dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: |
             /root/.cargo/registry
@@ -117,7 +117,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: target-dir
           path: target
