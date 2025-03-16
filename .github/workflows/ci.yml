@@ -20,10 +20,10 @@ jobs:
         task: [build-local, test, lint, fmt]
     steps:
       - name: 📥 Checkout repo
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v3
 
       - name: 📦 Cache cargo dependencies
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v3
         with:
           path: |
             /root/.cargo/registry
