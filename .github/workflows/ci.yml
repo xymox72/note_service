@@ -16,7 +16,7 @@ jobs:
     container:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
-      - uses: actions/checkout@v3.5.4
+      - uses: actions/checkout@v3.5.3
 
       - name: Cache cargo dependencies
         id: cache
@@ -45,7 +45,7 @@ jobs:
     container:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
-      - uses: actions/checkout@v3.5.4
+      - uses: actions/checkout@v3.5.3
 
       - name: Restore cargo cache
         uses: actions/cache@v3.3.2
@@ -58,7 +58,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3.1.2
+        uses: actions/download-artifact@v3
         with:
           name: target-dir
           path: target
@@ -73,7 +73,7 @@ jobs:
     container:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
-      - uses: actions/checkout@v3.5.4
+      - uses: actions/checkout@v3.5.3
 
       - name: Restore cargo cache
         uses: actions/cache@v3.3.2
@@ -86,7 +86,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3.1.2
+        uses: actions/download-artifact@v3
         with:
           name: target-dir
           path: target
@@ -101,7 +101,7 @@ jobs:
     container:
       image: ghcr.io/xymox72/devops-rust:latest
     steps:
-      - uses: actions/checkout@v3.5.4
+      - uses: actions/checkout@v3.5.3
 
       - name: Restore cargo cache
         uses: actions/cache@v3.3.2
@@ -114,7 +114,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3.1.2
+        uses: actions/download-artifact@v3
         with:
           name: target-dir
           path: target
